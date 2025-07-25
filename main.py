@@ -153,13 +153,25 @@ def categorize_email(subject: str) -> str:
         Category string
     """
     subject_lower = subject.lower()
-    
-    if 'invoice' in subject_lower:
-        return '💰 Invoice'
-    elif 'job' in subject_lower:
-        return '💼 Job'
+
+    if any(word in subject_lower for word in ['invoice', 'payment', 'balance', 'credit', 'icici', 'mab']):
+        return '💰 Banking / Payments'
+    elif any(word in subject_lower for word in ['job offer', 'offer details', 'details for']):
+        return '🧾 Offers / Details'
+    elif any(word in subject_lower for word in ['application', 'applied', 'submission', 'recruit', 'thank you for applying']):
+        return '💼 Job Applications'
+    elif any(word in subject_lower for word in ['assessment', 'coding', 'test', 'code signal']):
+        return '🧪 Assessments / Tests'
+    elif any(word in subject_lower for word in ['interview', 'session', 'invite', 'meeting', 'event']):
+        return '🗓️ Interviews / Events'
+    elif any(word in subject_lower for word in ['security', 'password', 'verify', 'account', 'login']):
+        return '🔒 Security / Account'
+    elif any(word in subject_lower for word in ['digest', 'newsletter', 'updates', 'substack', 'new thread']):
+        return '📬 Subscriptions / News'
+    elif any(word in subject_lower for word in ['unfortunately', 'not moving forward', 'decline', 'rejected']):
+        return '🧮 Rejections'
     else:
-        return '📧 General'
+        return '🪪 Misc / General'
 
 def send_whatsapp_notification(email_data: Dict[str, str]) -> bool:
     """
