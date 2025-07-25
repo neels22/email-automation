@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Go to the script directory
-cd /Users/indraneelsarode/Desktop/email-automation
+# Change to the new script directory
+cd /Users/indraneelsarode/scripts/email-automation
 
 # Activate virtual environment
 source ./myenv/bin/activate
 
-# Run the notifier
+# Run Python script
 ./myenv/bin/python slack.py
