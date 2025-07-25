@@ -4,3 +4,4 @@ myenv/
 credentials.json
 token.json
 gmail.py
+slack.log
