@@ -1,3 +1,109 @@
+# Gmail Email Monitor with Slack Notifications
+
+A Python application that monitors your Gmail inbox for unread emails and sends categorized notifications to a Slack channel using an incoming webhook. The script organizes emails by subject, posts a summary to Slack, and marks them as read to avoid duplicate alerts.
+
+## Features
+
+- ✅ **Gmail API Integration**: Secure OAuth 2.0 authentication (no IMAP required)
+- ✅ **Email Categorization**: Automatically sorts emails into categories based on subject keywords
+- ✅ **Slack Notifications**: Sends formatted alerts to a Slack channel via webhook
+- ✅ **Environment Variables**: Uses `.env` for secure configuration
+- ✅ **Auto Mark as Read**: Prevents duplicate notifications by marking emails as read after processing
+- ✅ **Simple Setup**: Minimal configuration required
+
+## How It Works
+
+1. **Authenticate with Gmail**: Uses OAuth 2.0 to access your Gmail inbox securely.
+2. **Fetch Unread Emails**: Looks for unread emails received in the last 24 hours.
+3. **Categorize Emails**: Analyzes the subject line to assign a category (e.g., Banking, Job Applications, Security, etc.).
+4. **Send Slack Notification**: Posts a summary (category, sender, subject, snippet) to your chosen Slack channel.
+5. **Mark as Read**: Marks the email as read in Gmail to avoid duplicate notifications.
+
+## Example Slack Notification
+
+```
+*💰 Banking / Payments*
+*From:* ICICI Bank
+*Subject:* Your account balance update
+Your account balance is INR 10,000 as of today...
+```
+
+## Setup Instructions
+
+### 1. Clone and Install Dependencies
+
+```bash
+git clone <your-repo-url>
+cd email-automation
+pip install -r requirements.txt
+```
+
+### 2. Enable Gmail API in Google Cloud Console
+
+Follow the same steps as in the WhatsApp section below to enable the Gmail API and download your `credentials.json` file.
+
+### 3. Create a Slack Incoming Webhook
+
+1. Go to your Slack workspace and open [Slack API: Incoming Webhooks](https://api.slack.com/messaging/webhooks).
+2. Click "Create a Slack App" (or use an existing app).
+3. Add the "Incoming Webhooks" feature and activate it.
+4. Click "Add New Webhook to Workspace" and select the channel you want notifications sent to.
+5. Copy the generated Webhook URL.
+
+### 4. Configure Environment Variables
+
+1. Create a `.env` file in your project root (or update it if it exists):
+
+```
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/your/webhook/url
+```
+
+2. Ensure your `.env` file is **not** committed to version control.
+
+### 5. Run the Slack Bot
+
+```bash
+python slack.py
+```
+
+- On first run, a browser window will open for Gmail authentication.
+- Grant access to your Gmail account.
+- The script will check for unread emails, send notifications to Slack, and mark them as read.
+
+## Email Categorization
+
+The bot uses keywords in the subject line to assign categories, such as:
+
+- 💰 Banking / Payments: invoice, payment, balance, credit, icici, mab
+- 🧾 Offers / Details: offer, details
+- 💼 Job Applications: application, applied, submission, recruit, careers, applying
+- 🧪 Assessments / Tests: assessment, coding, test, codesignal, hackerrank
+- 🗓️ Interviews / Events: interview, invite, session, meeting, event, call
+- 🔒 Security / Account: security, password, verify, account, login, unauthorized
+- 📬 Subscriptions / News: digest, newsletter, updates, substack, thread
+- 🧮 Rejections: unfortunately, decline, rejected, not moving forward, another candidate
+- 🪪 Misc / General: Anything else
+
+## Code Overview
+
+- `gmail_auth()`: Handles Gmail OAuth 2.0 authentication
+- `list_unread_messages()`: Fetches unread email IDs from the last 24 hours
+- `get_message_details()`: Extracts sender, subject, and a snippet of the body
+- `categorize_email()`: Assigns a category based on subject keywords
+- `send_slack_notification()`: Sends a formatted message to Slack
+- `mark_as_read()`: Marks the email as read in Gmail
+- `process_message()`: Orchestrates the above steps for each email
+- `main()`: Entry point for the script
+
+## Troubleshooting
+
+- **Missing credentials.json**: Download from Google Cloud Console and place in project root.
+- **Missing SLACK_WEBHOOK_URL**: Create a Slack webhook and add it to your `.env` file.
+- **Gmail API authentication failed**: Delete `token.json` and re-run the script to re-authenticate.
+- **No notifications in Slack**: Double-check your webhook URL and Slack channel permissions.
+
+---
+
 # Gmail Email Monitor with WhatsApp Alerts
 
 A Python application that monitors your Gmail for unread emails and sends WhatsApp notifications via Twilio. The script categorizes emails based on subject content and marks them as read after processing.
