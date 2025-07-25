@@ -115,45 +115,48 @@ def get_message_details(service, message_id: str) -> Dict[str, str]:
 
 def categorize_email(subject: str) -> str:
     subject = subject.lower()
-    if any(w in subject for w in ['invoice', 'payment', 'balance', 'credit', 'icici', 'mab']):
-        return '💰 Banking / Payments'
-    if any(w in subject for w in ['job offer', 'offer details', 'details for']):
-        return '🧾 Offers / Details'
-    if any(w in subject for w in ['application', 'applied', 'submission', 'recruit', 'thank you for applying']):
-        return '💼 Job Applications'
-    if any(w in subject for w in ['assessment', 'coding', 'test', 'code signal']):
-        return '🧪 Assessments / Tests'
-    if any(w in subject for w in ['interview', 'session', 'invite', 'meeting', 'event']):
-        return '🗓️ Interviews / Events'
-    if any(w in subject for w in ['security', 'password', 'verify', 'account', 'login']):
-        return '🔒 Security / Account'
-    if any(w in subject for w in ['digest', 'newsletter', 'updates', 'substack', 'new thread']):
-        return '📬 Subscriptions / News'
-    if any(w in subject for w in ['unfortunately', 'not moving forward', 'decline', 'rejected']):
-        return '🧮 Rejections'
+
+    categories = {
+        '💰 Banking / Payments': ['invoice', 'payment', 'balance', 'credit', 'icici', 'mab'],
+        '🧾 Offers / Details': ['offer', 'details'],
+        '💼 Job Applications': ['application', 'applied', 'submission', 'recruit', 'careers', 'applying'],
+        '🧪 Assessments / Tests': ['assessment', 'coding', 'test', 'codesignal', 'hackerrank'],
+        '🗓️ Interviews / Events': ['interview', 'invite', 'session', 'meeting', 'event', 'call'],
+        '🔒 Security / Account': ['security', 'password', 'verify', 'account', 'login', 'unauthorized'],
+        '📬 Subscriptions / News': ['digest', 'newsletter', 'updates', 'substack', 'thread'],
+        '🧮 Rejections': ['unfortunately', 'decline', 'rejected', 'not moving forward', 'another candidate']
+    }
+
+    for category, keywords in categories.items():
+        if any(word in subject for word in keywords):
+            return category
+
     return '🪪 Misc / General'
+
 
 def send_slack_notification(email_data: Dict[str, str]) -> bool:
     category = categorize_email(email_data['subject'])
-    snippet = email_data['body'][:300] + "..." if email_data['body'] else "(No body)"
+    sender = email_data['from'].split("<")[0].strip()
+    subject = email_data['subject'].strip()
+    snippet = email_data['body'].replace("\n", " ").strip()[:100] + "..." if email_data['body'] else ""
 
     message = (
-        f"*📬 New Email Alert*\n"
-        f"*From:* {email_data['from']}\n"
-        f"*Subject:* {email_data['subject']}\n"
-        f"*Category:* {category}\n"
-        f"*Body Preview:*\n```{snippet}```"
+        f"*{category}*\n"
+        f"*From:* {sender}\n"
+        f"*Subject:* {subject}\n"
+        f"{snippet}"
     )
 
     payload = {"text": message}
 
     try:
         res = requests.post(SLACK_WEBHOOK_URL, json=payload)
-        print(f"📲 Slack message sent ({res.status_code}): {email_data['subject']}")
+        print(f"📲 Slack message sent ({res.status_code}): {subject}")
         return res.ok
     except Exception as e:
         print(f"❌ Error sending Slack notification: {e}")
         return False
+
 
 def mark_as_read(service, message_id: str) -> bool:
     try:
