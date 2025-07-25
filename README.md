@@ -186,6 +186,51 @@ python main.py
    - Check your phone number format includes country code
    - Ensure `whatsapp:` prefix is included in `.env`
 
+---
+
+## Real-World Troubleshooting Examples
+
+### 1. Error 403: access_denied during OAuth
+
+**Symptom:**
+```
+Error 403: access_denied
+Request details: ...
+```
+
+**Cause:**
+- The Google account you are using is not added as a test user in the OAuth consent screen, or the OAuth consent screen is not fully configured.
+- You may be using the wrong OAuth client type (should be Desktop application).
+
+**How to Fix:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/).
+2. Navigate to **APIs & Services > OAuth consent screen**.
+3. Fill out all required fields (App name, support email, etc.).
+4. Under **Test users**, add the email address you use to log in during the OAuth flow.
+5. Save and retry authentication.
+6. Ensure your OAuth client is of type **Desktop application**.
+7. If you see an "unverified app" warning, click "Advanced" and proceed (safe for personal use).
+
+### 2. Gmail API has not been used in project ... or it is disabled
+
+**Symptom:**
+```
+❌ Error fetching unread messages: <HttpError 403 when requesting https://gmail.googleapis.com/gmail/v1/users/me/messages?q=is%3Aunread&alt=json returned "Gmail API has not been used in project ... before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/gmail.googleapis.com/overview?project=... then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.". Details: ...>
+```
+
+**Cause:**
+- The Gmail API is not enabled for your Google Cloud project, or you just enabled it and the change hasn't propagated yet.
+
+**How to Fix:**
+1. Visit the link provided in the error message, or go to [Gmail API enable page](https://console.developers.google.com/apis/api/gmail.googleapis.com/overview?project=YOUR_PROJECT_ID) (replace `YOUR_PROJECT_ID` with your project number).
+2. Click the **Enable** button.
+3. Wait a minute or two for the change to propagate.
+4. Re-run your script.
+
+**Tip:** If you enabled the API just now and still see the error, wait a few minutes and try again.
+
+---
+
 ### Security Notes
 
 - Never commit `credentials.json`, `token.json`, or `.env` files to version control

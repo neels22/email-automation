@@ -78,7 +78,7 @@ def gmail_auth() -> Optional[object]:
 
 def list_unread_messages(service) -> List[str]:
     """
-    Get list of unread message IDs from Gmail.
+    Get list of unread message IDs from Gmail from the last 24 hours.
     
     Args:
         service: Gmail API service object
@@ -86,16 +86,21 @@ def list_unread_messages(service) -> List[str]:
     Returns:
         List of message IDs
     """
+    import time
+    # Calculate Unix timestamp for 24 hours ago
+    now = int(time.time())
+    twenty_four_hours_ago = now - 24 * 60 * 60
+    query = f'is:unread after:{twenty_four_hours_ago}'
     try:
         results = service.users().messages().list(
             userId='me', 
-            q='is:unread'
+            q=query
         ).execute()
         
         messages = results.get('messages', [])
         message_ids = [msg['id'] for msg in messages]
         
-        print(f"📧 Found {len(message_ids)} unread messages")
+        print(f"\U0001F4E7 Found {len(message_ids)} unread messages from the last 24 hours")
         return message_ids
         
     except HttpError as error:
